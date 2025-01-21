@@ -1,9 +1,6 @@
 os: windows
 and app.name: Windows PowerShell
 os: windows
-app: windows_terminal
-and win.title: /PowerShell/
-os: windows
 and app.exe: powershell.exe
 -
 # makes the commands in terminal.talon available
@@ -17,5 +14,3 @@ tag(): user.generic_windows_shell
 tag(): user.git
 tag(): user.anaconda
 # tag(): user.kubectl
-
-tag(): user.file_manager

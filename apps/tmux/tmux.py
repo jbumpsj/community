@@ -1,13 +1,13 @@
-from talon import Context, Module, actions, settings
+from talon import Context, Module, actions
 
+ctx = Context()
 mod = Module()
 
-mod.apps.tmux = """
-tag: terminal
-and tag: user.tmux
+ctx.matches = r"""
+tag: user.tmux
 """
 
-mod.setting(
+setting_tmux_prefix_key = mod.setting(
     "tmux_prefix_key",
     type=str,
     default="ctrl-b",
@@ -19,7 +19,7 @@ mod.setting(
 class TmuxActions:
     def tmux_prefix():
         """press control and the configured tmux prefix key"""
-        actions.key(settings.get("user.tmux_prefix_key"))
+        actions.key(f"{setting_tmux_prefix_key.get()}")
 
     def tmux_keybind(key: str):
         """press tmux prefix followed by a key bind"""
@@ -43,10 +43,6 @@ class TmuxActions:
             f'confirm-before -p "{confirmation_prompt} (y/n)" {command}'
         )
         actions.key("\n")
-
-
-ctx = Context()
-ctx.matches = "app: tmux"
 
 
 @ctx.action_class("app")

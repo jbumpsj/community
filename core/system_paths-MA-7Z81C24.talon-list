@@ -1,0 +1,16 @@
+list: user.system_paths
+hostname: MA-7Z81C24
+-
+user: C:\Users\jbumpsj
+desktop: C:\Users\jbumpsj\Desktop
+desk: C:\Users\jbumpsj\Desktop
+documents: C:\Users\jbumpsj\Documents
+docks: C:\Users\jbumpsj\Documents
+downloads: C:\Users\jbumpsj\Downloads
+music: C:\Users\jbumpsj\Music
+pictures: C:\Users\jbumpsj\Pictures
+videos: C:\Users\jbumpsj\Videos
+talon home: C:\Users\jbumpsj\AppData\Roaming\talon
+talon recordings: C:\Users\jbumpsj\AppData\Roaming\talon\recordings
+talon user: C:\Users\jbumpsj\AppData\Roaming\talon\user
+profile: C:\Users\jbumpsj

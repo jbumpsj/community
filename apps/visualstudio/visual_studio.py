@@ -10,10 +10,13 @@
 
 from talon import Context, Module, actions
 
-mod = Module()
-ctx = Context()
+# is_mac = app.platform == "mac"
 
-mod.apps.visual_studio = r"""
+ctx = Context()
+mod = Module()
+
+apps = mod.apps
+apps.visual_studio = """
 os: windows
 and app.name: Microsoft Visual Studio 2022
 os: windows
@@ -22,13 +25,23 @@ os: windows
 and app.name: devenv.exe
 """
 
+
 ctx.matches = r"""
+app: visual_studio
+"""
+
+from talon import Context, actions
+
+ctx = Context()
+ctx.matches = r"""
+os: windows
 app: visual_studio
 """
 
 
 @ctx.action_class("app")
 class AppActions:
+    # talon app actions
     def tab_close():
         actions.key("ctrl-f4")
 
@@ -44,12 +57,14 @@ class AppActions:
 
 @ctx.action_class("code")
 class CodeActions:
+    # talon code actions
     def toggle_comment():
         actions.key("ctrl-k ctrl-/")
 
 
 @ctx.action_class("edit")
 class EditActions:
+    # talon edit actions
     def indent_more():
         actions.key("tab")
 
@@ -59,11 +74,9 @@ class EditActions:
     def save_all():
         actions.key("ctrl-shift-s")
 
-    def find_next():
-        actions.key("enter")
-
-    def find_previous():
-        actions.key("shift-enter")
+    def find(text: str):
+        actions.key("ctrl-f")
+        actions.insert(text)
 
     def line_swap_up():
         actions.key("alt-up")
@@ -85,16 +98,33 @@ class EditActions:
 class WinActions:
     def filename():
         title = actions.win.title()
+        # this doesn't seem to be necessary on VSCode for Mac
+        # if title == "":
+        #    title = ui.active_window().doc
+
         result = title.split("-")[0].rstrip()
+
         if "." in result:
+            # print(result)
             return result
+
         return ""
 
 
 @ctx.action_class("user")
 class UserActions:
-    def command_server_directory() -> str:
-        return "visual-studio-command-server"
+    # snippet.py support beginHelp close
+    def snippet_search(text: str):
+        """TEST"""
+        actions.key("ctrl-k ctrl-x")
+
+    # def snippet_insert(text: str):
+    #     """Inserts a snippet"""
+
+    # def snippet_create():
+    #     """Triggers snippet creation"""
+
+    # snippet.py support end
 
     # def select_word(verb: str):
     #     actions.key("ctrl-w")
@@ -149,6 +179,19 @@ class UserActions:
     # splits.py support end
 
     # find_and_replace.py support begin
+
+    def find(text: str):
+        """Triggers find in current editor"""
+        actions.key("ctrl-f")
+
+        if text:
+            actions.insert(text)
+
+    def find_next():
+        actions.key("enter")
+
+    def find_previous():
+        actions.key("shift-enter")
 
     def find_everywhere(text: str):
         """Triggers find across project"""

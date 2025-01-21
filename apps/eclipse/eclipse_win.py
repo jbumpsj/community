@@ -42,11 +42,9 @@ class CodeActions:
 
 @ctx.action_class("edit")
 class EditActions:
-    def find_next():
-        actions.key("enter")
-
-    def find_previous():
-        actions.key("shift-enter")
+    def find(text: str):
+        actions.key("ctrl-f")
+        actions.insert(text)
 
     def line_swap_up():
         actions.key("alt-up")
@@ -77,6 +75,23 @@ class EditActions:
 
 @ctx.action_class("user")
 class UserActions:
+    # generic_snippet.py support beginHelp close
+    # def snippet_search(text: str):
+    #     actions.user.vscode("Insert Snippet")
+    #     actions.insert(text)
+
+    # def snippet_insert(text: str):
+    #     """Inserts a snippet"""
+    #     actions.user.vscode("Insert Snippet")
+    #     actions.insert(text)
+    #     actions.key("enter")
+
+    # def snippet_create():
+    #     """Triggers snippet creation"""
+    #     actions.user.vscode("Preferences: Configure User Snippets")
+
+    # generic_snippet.py support end
+
     # splits.py support begin
     # requires https://marketplace.eclipse.org/content/handysplit
     def split_clear_all():
@@ -110,14 +125,22 @@ class UserActions:
     def split_window():
         actions.key("alt-ctrl-s s")
 
-    def command_search(command: str = ""):
-        actions.key("ctrl-3")
-        if command != "":
-            actions.insert(command)
-
     # splits.py support end
 
     # find_and_replace.py support begin
+
+    def find(text: str):
+        """Triggers find in current editor"""
+
+        actions.key("ctrl-f")
+        if text:
+            actions.insert(text)
+
+    def find_next():
+        actions.key("enter")
+
+    def find_previous():
+        actions.key("shift-enter")
 
     def find_everywhere(text: str):
         """Triggers find across project"""

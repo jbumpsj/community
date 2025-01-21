@@ -5,9 +5,9 @@ mod = Module()
 
 mod.apps.brave = "app.name: Brave Browser"
 mod.apps.brave = "app.name: Brave-browser"
-mod.apps.brave = r"""
+mod.apps.brave = """
 os: windows
-and app.exe: /^brave\.exe$/i
+and app.exe: brave.exe
 os: linux
 and app.exe: brave
 os: mac

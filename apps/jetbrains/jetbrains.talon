@@ -5,9 +5,6 @@ tag(): user.line_commands
 tag(): user.multiple_cursors
 tag(): user.splits
 tag(): user.tabs
-tag(): user.command_search
-tag(): user.command_client
-
 # multiple_cursors.py support end
 
 # Auto complete
@@ -17,7 +14,11 @@ smart: user.idea("action SmartTypeCompletion")
 (done | finish): user.idea("action EditorCompleteStatement")
 # Copying
 grab <number>: user.idea_grab(number)
-action [<user.text>]: user.deprecate_command("2024-09-02", "action", "please")
+# Actions
+(action | please): user.idea("action GotoAction")
+(action | please) <user.text>:
+    user.idea("action GotoAction")
+    insert(text)
 # Refactoring
 refactor: user.idea("action Refactorings.QuickListPopupAction")
 refactor <user.text>:
@@ -236,48 +237,18 @@ comment next <user.text> [over]:
     user.idea("find next {text}, action CommentByLineComment")
 go last <user.text> [over]: user.idea("find prev {text}, action EditorRight")
 go next <user.text> [over]: user.idea("find next {text}, action EditorRight")
-go <number> <user.text> [over]:
-    user.idea("goto {number} 0,find next {text}, action EditorRight")
 paste last <user.text> [over]:
     user.idea("find prev {text}, action EditorRight, action EditorPaste")
 paste next <user.text> [over]:
     user.idea("find next {text}, action EditorRight, action EditorPaste")
-refactor <number> <user.text> [over]:
-    user.idea("goto {number} 0,find next {text}, action Refactorings.QuickListPopupAction")
 refactor last <user.text> [over]:
     user.idea("find prev {text}, action Refactorings.QuickListPopupAction")
 refactor next <user.text> [over]:
     user.idea("find next {text}, action Refactorings.QuickListPopupAction")
-rename <number> <user.text> [over]:
-    user.idea("goto {number} 0,find next {text}, action RenameElement")
-rename next <user.text> [over]: user.idea("find next {text}, action RenameElement")
-rename last <user.text> [over]: user.idea("find prev {text}, action RenameElement")
-complete <number> <user.text> [over]:
-    user.idea("goto {number} 0,find next {text},action CodeCompletion")
-complete next <user.text> [over]: user.idea("find next {text},action CodeCompletion")
-complete last <user.text> [over]: user.idea("find prev {text},action CodeCompletion")
-quick fix <number> <user.text> [over]:
-    user.idea("goto {number} 0,find next {text},action ShowIntentionActions")
-quick fix next <user.text> [over]:
-    user.idea("find next {text},action ShowIntentionActions")
-quick fix last <user.text> [over]:
-    user.idea("find prev {text},action ShowIntentionActions")
 replace last <user.text> [over]: user.idea("find prev {text}, action EditorPaste")
 replace next <user.text> [over]: user.idea("find next {text}, action EditorPaste")
-
-follow <number> <user.text> [over]:
-    user.idea("goto {number} 0,find next {text},action GotoDeclaration")
-follow next <user.text> [over]: user.idea("find next {text},action GotoDeclaration")
-follow last <user.text> [over]: user.idea("find prev {text},action GotoDeclaration")
-
-reference <number> <user.text> [over]:
-    user.idea("goto {number} 0,find next {text},action FindUsages")
-reference next <user.text> [over]: user.idea("find next {text},action FindUsages")
-reference last <user.text> [over]: user.idea("find prev {text},action FindUsages")
-
 select last <user.text> [over]: user.idea("find prev {text}")
 select next <user.text> [over]: user.idea("find next {text}")
-select <number> <user.text> [over]: user.idea("goto {number} 0,find next {text}")
 
 select camel left: user.extend_camel_left()
 select camel right: user.extend_camel_right()

@@ -2,11 +2,11 @@ from talon import Context, Module, actions
 
 # --- App definition ---
 mod = Module()
-mod.apps.okular = r"""
+mod.apps.okular = """
 os: windows
 and app.name: okular.exe
 os: windows
-and app.exe: /^okular\.exe$/i
+and app.exe: okular.exe
 """
 mod.apps.okular = """
 os: linux

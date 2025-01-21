@@ -1,4 +1,4 @@
-app: microsoft_teams
+app.exe:ms-teams.exe
 os: windows
 os: linux
 -
@@ -19,25 +19,26 @@ open help: key(f1)
 close: key(escape)
 
 # navigations
-open activity: key(ctrl-1)
-open chat: key(ctrl-2)
-open teams: key(ctrl-3)
-open calendar: key(ctrl-4)
-open planner: key(ctrl-5)
-open calls: key(ctrl-6)
-open files: key(ctrl-7)
+go to activity: key(ctrl-3)
+go to chat: key(ctrl-4)
+go to teams: key(ctrl-5)
+go to calendar: key(ctrl-2)
+go to tasks: key(ctrl-8)
+go to calls: key(ctrl-1)
+go to files: key(ctrl-6)
 [go] [to] (prev | previous) [list] item: key(alt-up)
 [go] [to] next [list] item: key(alt-down)
 move [selected] team up: key(ctrl-shift-up)
 move [selected] team down: key(ctrl-shift-down)
 [go] [to] (prev | previous) section: key(ctrl-shift-f6)
 [go] [to] next section: key(ctrl-f6)
+[go] [to] left pane: key(ctrl-l)
 
 # messaging
-[go] [to] compose [box]: key(c)
+[go] [to] compose [box]: key(ctrl-r)
 [expand] compose [box]: key(ctrl-shift-x)
 send: key(ctrl-enter)
-attach file: key(ctrl-o)
+attach file: key(alt-shift-o)
 [start] new line: key(shift-enter)
 reply [to] [thread]: key(r)
 
@@ -47,6 +48,7 @@ accept audio call: key(ctrl-shift-s)
 decline call: key(ctrl-shift-d)
 start audio call: key(ctrl-shift-c)
 start video call: key(ctrl-shift-u)
+end call: key(ctrl-shift-h)
 toggle mute: key(ctrl-shift-m)
 starch screen share session: key(ctrl-shift-e)
 toggle video: key(ctrl-shift-o)

@@ -10,6 +10,7 @@ app: visual_studio
 
 @ctx.action_class("app")
 class AppActions:
+    # talon app actions
     def tab_close():
         actions.key("ctrl-f4")
 
@@ -25,12 +26,14 @@ class AppActions:
 
 @ctx.action_class("code")
 class CodeActions:
+    # talon code actions
     def toggle_comment():
         actions.key("ctrl-k ctrl-/")
 
 
 @ctx.action_class("edit")
 class EditActions:
+    # talon edit actions
     def indent_more():
         actions.key("tab")
 

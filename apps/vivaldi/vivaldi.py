@@ -5,9 +5,9 @@ mod = Module()
 
 mod.apps.vivaldi = "app.name: Vivaldi"
 mod.apps.vivaldi = "app.name: Vivaldi-stable"
-mod.apps.vivaldi = r"""
+mod.apps.vivaldi = """
 os: windows
-and app.exe: /^vivaldi\.exe$/i
+and app.exe: vivaldi.exe
 os: linux
 and app.exe: vivaldi-bin
 os: mac
@@ -26,7 +26,9 @@ class Actions:
 
     def vivaldi_bookmarks_panel():
         """Toggles the Vivaldi bookmarks panel"""
-        actions.user.command_search("Bookmarks Panel")
+        actions.user.vivaldi_toggle_quick_commands()
+        actions.sleep("180ms")
+        actions.insert("Bookmarks Panel")
         actions.key("enter")
 
     def vivaldi_downloads_panel():
@@ -37,6 +39,10 @@ class Actions:
         """Toggles the Vivaldi notes panel"""
         actions.key("ctrl-shift-o")
 
+    def vivaldi_toggle_quick_commands():
+        """Toggles the Vivaldi Quick Commands tool"""
+        actions.key("ctrl-e")
+
 
 @ctx.action_class("user")
 class UserActions:
@@ -46,12 +52,6 @@ class UserActions:
 
     def tab_jump(number: int):
         actions.key(f"ctrl-{number}")
-
-    def command_search(command: str = ""):
-        actions.key("ctrl-e")
-        if command != "":
-            actions.sleep("180ms")
-            actions.insert(command)
 
 
 @ctx.action_class("browser")

@@ -5,7 +5,6 @@ is_mac = app.platform == "mac"
 ctx = Context()
 mac_ctx = Context()
 mod = Module()
-# com.todesktop.230313mzl4w4u92 is for Cursor - https://www.cursor.com/
 mod.apps.vscode = """
 os: mac
 and app.bundle: com.microsoft.VSCode
@@ -13,8 +12,6 @@ os: mac
 and app.bundle: com.microsoft.VSCodeInsiders
 os: mac
 and app.bundle: com.visualstudio.code.oss
-os: mac
-and app.bundle: com.todesktop.230313mzl4w4u92
 """
 mod.apps.vscode = """
 os: linux
@@ -27,10 +24,8 @@ os: linux
 and app.name: VSCodium
 os: linux
 and app.name: Codium
-os: linux
-and app.name: Cursor
 """
-mod.apps.vscode = r"""
+mod.apps.vscode = """
 os: windows
 and app.name: Visual Studio Code
 os: windows
@@ -38,19 +33,13 @@ and app.name: Visual Studio Code Insiders
 os: windows
 and app.name: Visual Studio Code - Insiders
 os: windows
-and app.exe: /^code\.exe$/i
+and app.exe: Code.exe
 os: windows
-and app.exe: /^code-insiders\.exe$/i
+and app.exe: Code-Insiders.exe
 os: windows
 and app.name: VSCodium
 os: windows
-and app.exe: /^vscodium\.exe$/i
-os: windows
-and app.name: Azure Data Studio
-os: windows
-and app.exe: /^azuredatastudio\.exe$/i
-os: windows
-and app.exe: positron.exe
+and app.exe: VSCodium.exe
 """
 
 ctx.matches = r"""
@@ -106,14 +95,13 @@ class EditActions:
     def save_all():
         actions.user.vscode("workbench.action.files.saveAll")
 
-    def save():
-        actions.user.vscode("workbench.action.files.save")
-
-    def find_next():
-        actions.user.vscode("editor.action.nextMatchFindAction")
-
-    def find_previous():
-        actions.user.vscode("editor.action.previousMatchFindAction")
+    def find(text=None):
+        if is_mac:
+            actions.key("cmd-f")
+        else:
+            actions.key("ctrl-f")
+        if text is not None:
+            actions.insert(text)
 
     def line_swap_up():
         actions.key("alt-up")
@@ -135,9 +123,6 @@ class EditActions:
         actions.insert(str(n))
         actions.key("enter")
         actions.edit.line_start()
-
-    def zoom_reset():
-        actions.user.vscode("workbench.action.zoomReset")
 
 
 @ctx.action_class("win")
@@ -170,14 +155,6 @@ class Actions:
         actions.key("ctrl-shift-p")
 
 
-@mac_ctx.action_class("edit")
-class MacEditActions:
-    def find(text: str = None):
-        actions.key("cmd-f")
-        if text:
-            actions.insert(text)
-
-
 @mac_ctx.action_class("user")
 class MacUserActions:
     def command_palette():
@@ -197,7 +174,7 @@ class UserActions:
         actions.user.vscode("workbench.action.toggleEditorGroupLayout")
 
     def split_maximize():
-        actions.user.vscode("workbench.action.toggleMaximizeEditorGroup")
+        actions.user.vscode("workbench.action.maximizeEditor")
 
     def split_reset():
         actions.user.vscode("workbench.action.evenEditorWidths")
@@ -228,23 +205,6 @@ class UserActions:
 
     def split_window():
         actions.user.vscode("workbench.action.splitEditor")
-
-    def split_number(index: int):
-        supported_ordinals = [
-            "First",
-            "Second",
-            "Third",
-            "Fourth",
-            "Fifth",
-            "Sixth",
-            "Seventh",
-            "Eighth",
-        ]
-
-        if 0 <= index - 1 < len(supported_ordinals):
-            actions.user.vscode(
-                f"workbench.action.focus{supported_ordinals[index - 1]}EditorGroup"
-            )
 
     # splits.py support end
 
@@ -277,14 +237,23 @@ class UserActions:
     def multi_cursor_skip_occurrence():
         actions.user.vscode("editor.action.moveSelectionToNextFindMatch")
 
-    # multiple_cursor.py support end
+    # snippet.py support begin
+    def snippet_search(text: str):
+        actions.user.vscode("editor.action.insertSnippet")
+        actions.insert(text)
 
-    def command_search(command: str = ""):
-        actions.user.vscode("workbench.action.showCommands")
-        if command != "":
-            actions.insert(command)
+    def snippet_insert(text: str):
+        """Inserts a snippet"""
+        actions.user.vscode("editor.action.insertSnippet")
+        actions.insert(text)
+        actions.key("enter")
 
-    # tabs.py support begin
+    def snippet_create():
+        """Triggers snippet creation"""
+        actions.user.vscode("workbench.action.openSnippets")
+
+    # snippet.py support end
+
     def tab_jump(number: int):
         if number < 10:
             if is_mac:
@@ -304,14 +273,34 @@ class UserActions:
         else:
             actions.key("alt-0")
 
-    def tab_duplicate():
-        # Duplicates the current tab into a new tab group
-        # vscode does not allow duplicate tabs in the same tab group, and so is implemented through splits
-        actions.user.split_window_vertically()
+    # splits.py support begin
+    def split_number(index: int):
+        """Navigates to a the specified split"""
+        if index < 9:
+            if is_mac:
+                actions.key(f"cmd-{index}")
+            else:
+                actions.key(f"ctrl-{index}")
 
-    # tabs.py support end
+    # splits.py support end
 
     # find_and_replace.py support begin
+
+    def find(text: str):
+        """Triggers find in current editor"""
+        if is_mac:
+            actions.key("cmd-f")
+        else:
+            actions.key("ctrl-f")
+
+        if text:
+            actions.insert(text)
+
+    def find_next():
+        actions.user.vscode("editor.action.nextMatchFindAction")
+
+    def find_previous():
+        actions.user.vscode("editor.action.previousMatchFindAction")
 
     def find_everywhere(text: str):
         """Triggers find across project"""
@@ -387,6 +376,3 @@ class UserActions:
         actions.edit.find(text)
         actions.sleep("100ms")
         actions.key("esc")
-
-    def insert_snippet(body: str):
-        actions.user.run_rpc_command("editor.action.insertSnippet", {"snippet": body})

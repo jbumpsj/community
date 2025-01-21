@@ -1,10 +1,10 @@
 import logging
 from typing import Optional
 
-from talon import Context, Module, actions, settings
+from talon import Context, Module, actions
 
 mod = Module()
-mod.setting(
+setting_meta = mod.setting(
     "emacs_meta",
     type=str,
     default="esc",
@@ -18,9 +18,9 @@ mod.apps.emacs = """
 os: mac
 app.bundle: org.gnu.Emacs
 """
-mod.apps.emacs = r"""
+mod.apps.emacs = """
 os: windows
-app.exe: /^emacs\.exe$/i
+app.exe: emacs.exe
 """
 
 ctx = Context()
@@ -28,7 +28,7 @@ ctx.matches = "app: emacs"
 
 
 def meta(keys):
-    m = settings.get("user.emacs_meta")
+    m = setting_meta.get()
     if m == "alt":
         return " ".join("alt-" + k for k in keys.split())
     elif m == "cmd":

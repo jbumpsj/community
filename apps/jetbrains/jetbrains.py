@@ -1,13 +1,15 @@
 import os
 import os.path
 import tempfile
+import time
 from pathlib import Path
-from typing import Optional
 
 import requests
-from talon import Context, Module, actions, app, clip, ui
+from talon import Context, Module, actions, clip, ui
 
 # Courtesy of https://github.com/anonfunc/talon-user/blob/master/apps/jetbrains.py
+
+extendCommands = []
 
 # Each IDE gets its own port, as otherwise you wouldn't be able
 # to run two at the same time and switch between them.
@@ -31,7 +33,6 @@ port_mapping = {
     "google-android-studio": 8652,
     "idea64.exe": 8653,
     "IntelliJ IDEA": 8653,
-    "IntelliJ IDEA Community Edition": 8654,
     "jetbrains-appcode": 8655,
     "jetbrains-clion": 8657,
     "jetbrains-datagrip": 8664,
@@ -55,21 +56,20 @@ port_mapping = {
     "pycharm64.exe": 8658,
     "WebStorm": 8663,
     "webstorm64.exe": 8663,
-    # Local plugin development:
-    "com.jetbrains.jbr.java": 8666,
 }
 
 
-def _get_nonce(port: int, file_prefix: str) -> Optional[str]:
+def _get_nonce(port, file_prefix):
     file_name = file_prefix + str(port)
     try:
         with open(os.path.join(tempfile.gettempdir(), file_name)) as fh:
             return fh.read()
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         try:
-            with open(Path.home() / file_name) as fh:
+            home = str(Path.home())
+            with open(os.path.join(home, file_name)) as fh:
                 return fh.read()
-        except FileNotFoundError:
+        except FileNotFoundError as eb:
             print(f"Could not find {file_name} in tmp or home")
             return None
     except OSError as e:
@@ -77,27 +77,37 @@ def _get_nonce(port: int, file_prefix: str) -> Optional[str]:
         return None
 
 
-def send_idea_command(cmd: str) -> str:
+def send_idea_command(cmd):
+    print(f"Sending {cmd}")
     active_app = ui.active_app()
     bundle = active_app.bundle or active_app.name
     port = port_mapping.get(bundle, None)
-    if not port:
-        raise Exception(f"unknown application {bundle}")
     nonce = _get_nonce(port, ".vcidea_") or _get_nonce(port, "vcidea_")
-    if not nonce:
-        raise FileNotFoundError(f"Couldn't find IDEA nonce file for port {port}")
+    proxies = {"http": None, "https": None}
+    print(f"sending {bundle} {port} {nonce}")
+    if port and nonce:
+        response = requests.get(
+            f"http://localhost:{port}/{nonce}/{cmd}",
+            proxies=proxies,
+            timeout=(0.05, 3.05),
+        )
+        response.raise_for_status()
+        return response.text
 
-    response = requests.get(
-        f"http://localhost:{port}/{nonce}/{cmd}",
-        proxies={"http": None, "https": None},
-        timeout=(0.05, 3.05),
-    )
-    response.raise_for_status()
-    return response.text
 
-
-def get_idea_location() -> list[str]:
+def get_idea_location():
     return send_idea_command("location").split()
+
+
+def idea_commands(commands):
+    command_list = commands.split(",")
+    print("executing jetbrains", commands)
+    global extendCommands
+    extendCommands = command_list
+    for cmd in command_list:
+        if cmd:
+            send_idea_command(cmd.strip())
+            time.sleep(0.1)
 
 
 ctx = Context()
@@ -106,7 +116,6 @@ mod = Module()
 mod.apps.jetbrains = "app.name: /jetbrains/"
 mod.apps.jetbrains = "app.name: CLion"
 mod.apps.jetbrains = "app.name: IntelliJ IDEA"
-mod.apps.jetbrains = "app.name: PhpStorm"
 mod.apps.jetbrains = "app.name: PyCharm"
 mod.apps.jetbrains = "app.name: WebStorm"
 mod.apps.jetbrains = "app.name: RubyMine"
@@ -117,53 +126,27 @@ os: mac
 and app.bundle: com.google.android.studio
 """
 # windows
-mod.apps.jetbrains = r"app.exe: /^idea64\.exe$/i"
-mod.apps.jetbrains = r"app.exe: /^PyCharm64\.exe$/i"
-mod.apps.jetbrains = r"app.exe: /^webstorm64\.exe$/i"
+mod.apps.jetbrains = "app.exe: idea64.exe"
+mod.apps.jetbrains = "app.exe: PyCharm64.exe"
+mod.apps.jetbrains = "app.exe: pycharm64.exe"
+mod.apps.jetbrains = "app.exe: webstorm64.exe"
 mod.apps.jetbrains = """
 os: mac
 and app.bundle: com.jetbrains.pycharm
 """
 mod.apps.jetbrains = """
-os: mac
-and app.bundle: com.jetbrains.rider
-"""
-mod.apps.jetbrains = """
-os: mac
-and app.bundle: com.jetbrains.goland
-"""
-mod.apps.jetbrains = """
-os: mac
-and app.bundle: com.jetbrains.intellij.ce
-"""
-mod.apps.jetbrains = r"""
 os: windows
 and app.name: JetBrains Rider
 os: windows
-and app.exe: /^rider64\.exe$/i
-"""
-
-# Local plugin development:
-mod.apps.jetbrains = """
-os: mac
-and app.bundle: com.jetbrains.jbr.java
+and app.exe: rider64.exe
 """
 
 
 @mod.action_class
 class Actions:
-
     def idea(commands: str):
         """Send a command to Jetbrains product"""
-        command_list = commands.split(",")
-        try:
-            for cmd in command_list:
-                if cmd:
-                    send_idea_command(cmd.strip())
-                    actions.sleep(0.1)
-        except Exception as e:
-            app.notify(str(e))
-            raise
+        idea_commands(commands)
 
     def idea_grab(times: int):
         """Copies specified number of words to the left"""
@@ -177,6 +160,8 @@ class Actions:
             send_idea_command("action EditorPaste")
         finally:
             clip.set(old_clip)
+            global extendCommands
+            extendCommands = []
 
 
 ctx.matches = r"""
@@ -229,8 +214,6 @@ class EditActions:
 
     def find(text: str = None):
         actions.user.idea("action Find")
-        if text:
-            actions.insert(text)
 
     def line_clone():
         actions.user.idea("action EditorDuplicate")
@@ -299,10 +282,6 @@ class WinActions:
 
 @ctx.action_class("user")
 class UserActions:
-
-    def command_server_directory() -> str:
-        return "jetbrains-command-server"
-
     def tab_jump(number: int):
         # depends on plugin GoToTabs
         if number < 10:
@@ -315,7 +294,7 @@ class UserActions:
         # if it's a single line, select the entire thing including the ending new-line5
         if line_start == line_end:
             actions.user.idea(f"goto {line_start} 0")
-            actions.user.idea("action EditorSelectLine")
+            actions.user.idea("action EditorSelectLine"),
         else:
             actions.user.idea(f"range {line_start} {line_end}")
 
@@ -330,11 +309,6 @@ class UserActions:
 
     def camel_right():
         actions.user.idea("action EditorNextWordInDifferentHumpsMode")
-
-    def command_search(command: str = ""):
-        actions.user.idea("action GotoAction")
-        if command != "":
-            actions.insert(command)
 
     def line_clone(line: int):
         actions.user.idea(f"clone {line}")

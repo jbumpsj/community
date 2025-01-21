@@ -4,16 +4,15 @@ app: vscode
 tag(): user.find_and_replace
 tag(): user.line_commands
 tag(): user.multiple_cursors
+tag(): user.snippets
 tag(): user.splits
 tag(): user.tabs
-tag(): user.command_search
-
 window reload: user.vscode("workbench.action.reloadWindow")
 window close: user.vscode("workbench.action.closeWindow")
 #multiple_cursor.py support end
 
-go view [<user.text>]:
-    user.vscode("workbench.action.openView")
+please [<user.text>]:
+    user.vscode("workbench.action.showCommands")
     insert(user.text or "")
 
 # Sidebar
@@ -55,10 +54,6 @@ show settings workspace json: user.vscode("workbench.action.openWorkspaceSetting
 show shortcuts: user.vscode("workbench.action.openGlobalKeybindings")
 show shortcuts json: user.vscode("workbench.action.openGlobalKeybindingsFile")
 show snippets: user.vscode("workbench.action.openSnippets")
-
-# VSCode Snippets
-snip (last | previous): user.vscode("jumpToPrevSnippetPlaceholder")
-snip next: user.vscode("jumpToNextSnippetPlaceholder")
 
 # Display
 centered switch: user.vscode("workbench.action.toggleCenteredLayout")
@@ -186,7 +181,7 @@ git merge: user.vscode("git.merge")
 git output: user.vscode("git.showOutput")
 git pull: user.vscode("git.pullRebase")
 git push: user.vscode("git.push")
-git push force: user.vscode("git.pushForce")
+git push focus: user.vscode("git.pushForce")
 git rebase abort: user.vscode("git.rebaseAbort")
 git reveal: user.vscode("git.revealInExplorer")
 git revert: user.vscode("git.revertChange")
@@ -245,9 +240,6 @@ terminal scroll up: user.vscode("workbench.action.terminal.scrollUp")
 terminal scroll down: user.vscode("workbench.action.terminal.scrollDown")
 terminal <number_small>: user.vscode_terminal(number_small)
 
-task run [<user.text>]:
-    user.vscode("workbench.action.tasks.runTask")
-    insert(user.text or "")
 #TODO: should this be added to linecommands?
 copy line down: user.vscode("editor.action.copyLinesDownAction")
 copy line up: user.vscode("editor.action.copyLinesUpAction")
@@ -275,7 +267,6 @@ join lines: user.vscode("editor.action.joinLines")
 full screen: user.vscode("workbench.action.toggleFullScreen")
 
 curse undo: user.vscode("cursorUndo")
-curse redo: user.vscode("cursorRedo")
 
 select word: user.vscode("editor.action.addSelectionToNextFindMatch")
 skip word: user.vscode("editor.action.moveSelectionToNextFindMatch")

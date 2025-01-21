@@ -8,9 +8,9 @@ apps.opera = """
 os: mac
 and app.bundle: com.operasoftware.Opera
 """
-apps.opera = r"""
+apps.opera = """
 os: windows
-and app.exe: /^opera\.exe$/i
+and app.exe: opera.exe
 """
 apps.opera = """
 os: linux

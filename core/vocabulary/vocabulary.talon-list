@@ -2,10 +2,68 @@ list: user.vocabulary
 -
 N map: nmap
 under documented: under-documented
-nmap
-admin
-Cisco
+: nmap
+: admin
+: Cisco
 Citrix
-VPN
-DNS
-Minecraft
+: IP
+eye peas: "IP's"
+: VPN
+: DNS
+extranet
+: Minecraft
+Meraki
+zeescaler: Zscaler
+DeVNeT: DevNet
+CDP
+right mem: wr mem
+ZIA
+ZPA
+JCI
+NAT
+Natting: "NAT'ing"
+SLA
+Fortinet
+conf t
+Burath: Bharath
+VLAN
+portchannel: port-channel
+toofin: tufin
+yup
+nslookup
+VPC
+Hiruy
+Rango
+MDC
+PDC
+FDC
+PDC1
+PDC2
+ACL
+Adam
+SDWAN
+Meraki's
+netmeeko: netmiko
+: Vinay
+: Vinays
+: getpass
+: Logility
+: Logilitys
+IPS
+pix
+pixs
+tacacs
+fortigate
+fortigates
+SolarWinds
+SolarWindss
+EC1
+EC1s
+idam
+idam's
+C M D B: CMDB
+C M D Bs: CMDBs
+Guardicore
+Guardicores
+comtrol
+comtrols
